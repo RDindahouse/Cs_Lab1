@@ -54,6 +54,18 @@ class Group
     {
         return groupName;
     }
+
+    public bool HasHead()
+    {
+        foreach (var student in students)
+        {
+            if (student.IsHead)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 class Program
@@ -166,6 +178,12 @@ class Program
 
         Console.WriteLine($"Is student {students[studentIndex - 1].Name} a head? (Y/N)");
         bool isHead = Console.ReadLine().ToUpper() == "Y";
+
+        if (isHead && group.HasHead() && !students[studentIndex - 1].IsHead)
+        {
+            Console.WriteLine("This group already has a head student. You cannot add another one.");
+            return;
+        }
 
         students[studentIndex - 1].Name = newName;
         students[studentIndex - 1].Age = newAge;
