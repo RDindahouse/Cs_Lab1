@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Xml;
+using System.Xml.Linq;
 
 namespace LogParser
 {
@@ -30,19 +30,16 @@ namespace LogParser
         {
             Log log = new Log();
 
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xml);
-
-            XmlNodeList eventNodes = xmlDoc.SelectNodes("/log/event");
-            foreach (XmlNode eventNode in eventNodes)
+            XDocument doc = XDocument.Parse(xml);
+            foreach (XElement eventElement in doc.Descendants("event"))
             {
                 Event logEvent = new Event();
-                logEvent.Date = DateTime.ParseExact(eventNode.Attributes["date"].Value.Trim(), "dd/MMM/yyyy:HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-                logEvent.Result = eventNode.Attributes["result"].Value.Trim();
-                logEvent.IpFrom = eventNode.SelectSingleNode("ip-from")?.InnerText.Trim() ?? string.Empty;
-                logEvent.Method = eventNode.SelectSingleNode("method")?.InnerText.Trim() ?? string.Empty;
-                logEvent.UrlTo = eventNode.SelectSingleNode("url-to")?.InnerText.Trim() ?? string.Empty;
-                logEvent.Response = int.Parse(eventNode.SelectSingleNode("response")?.InnerText.Trim() ?? "0");
+                logEvent.Date = DateTime.ParseExact(eventElement.Attribute("date").Value.Trim(), "dd/MMM/yyyy:HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+                logEvent.Result = eventElement.Attribute("result").Value.Trim();
+                logEvent.IpFrom = eventElement.Element("ip-from")?.Value.Trim() ?? string.Empty;
+                logEvent.Method = eventElement.Element("method")?.Value.Trim() ?? string.Empty;
+                logEvent.UrlTo = eventElement.Element("url-to")?.Value.Trim() ?? string.Empty;
+                logEvent.Response = int.Parse(eventElement.Element("response")?.Value.Trim() ?? "0");
 
                 log.Events.Add(logEvent);
             }
